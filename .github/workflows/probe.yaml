@@ -1,0 +1,46 @@
+# Which secret stores can each actor/event read? Prints booleans only, never values.
+name: probe
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  plain:
+    name: plain (no environment)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        env:
+          EVENT: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          REF: ${{ github.ref }}
+          HAS_ACTIONS: ${{ secrets.PROBE_ACTIONS != '' }}
+          HAS_DEPENDABOT: ${{ secrets.PROBE_DEPENDABOT != '' }}
+        run: |
+          echo "PROBE plain event=$EVENT actor=$ACTOR ref=$REF actions_secret=$HAS_ACTIONS dependabot_secret=$HAS_DEPENDABOT"
+          echo "PROBE plain event=$EVENT actor=$ACTOR ref=$REF actions_secret=$HAS_ACTIONS dependabot_secret=$HAS_DEPENDABOT" >> "$GITHUB_STEP_SUMMARY"
+
+  with-environment:
+    name: environment probe-main
+    runs-on: ubuntu-latest
+    environment: probe-main
+    steps:
+      - name: Report
+        env:
+          EVENT: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          REF: ${{ github.ref }}
+          HAS_ENV: ${{ secrets.PROBE_ENV != '' }}
+          HAS_ACTIONS: ${{ secrets.PROBE_ACTIONS != '' }}
+          HAS_DEPENDABOT: ${{ secrets.PROBE_DEPENDABOT != '' }}
+        run: |
+          echo "PROBE env event=$EVENT actor=$ACTOR ref=$REF env_secret=$HAS_ENV actions_secret=$HAS_ACTIONS dependabot_secret=$HAS_DEPENDABOT"
+          echo "PROBE env event=$EVENT actor=$ACTOR ref=$REF env_secret=$HAS_ENV actions_secret=$HAS_ACTIONS dependabot_secret=$HAS_DEPENDABOT" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,10 @@
+# Deliberately outdated pin: gives Dependabot something to bump.
+name: ci
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
